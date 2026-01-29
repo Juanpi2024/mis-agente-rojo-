@@ -1,6 +1,6 @@
-# USER.md - Sobre el Estratega
+# USER.md - Sobre el Estratega Juan Pablo
 
-- **Nombre:** Juan Pablo Ramírez
+- **Nombre:** Juan Pablo
 - **Intereses Principales:**
   - Venta de material educativo online.
   - Monitoreo cívico y político (Civic Watchdog).
