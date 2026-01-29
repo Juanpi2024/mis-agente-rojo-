@@ -8,7 +8,10 @@
 
 ## 📋 Registro de Operaciones
 
-- [ ] Esperando primer archivo Word para sanitizar.
+## 📋 Registro de Operaciones
+
+- [/] `PLANIFICACION_OCTUBRE_PENDIENTE.DOC` (En proceso de sanitización de metadatos...)
+- [ ] `GUIA__LA_NOTICIA_.DOC` (En cola para limpieza tras revisión pedagógica)
 
 ---
 

@@ -10,63 +10,65 @@ Para saber cómo llamar a cada agente, consulta el archivo [PROTOCOLS.md](./PROT
 
 ## 🏗️ Estructura de Agentes Especialistas (En Desarrollo)
 
-### 1. Agente Especialista en Contenido Pedagógico
+### 1. **Fidel** (Especialista en Contenido Pedagógico)
 
 - **Misión:** Generar guías, actividades y evaluaciones de alta calidad basadas en el currículum chileno.
-- **Estado:** ✅ Inicializado. Esperando planificación "clase a clase".
+- **Estado:** ✅ Analizando Guía "La Noticia" (Octubre).
 - **Ubicación:** `agents/pedagogico/`
 
-### 2. Agente Especialista en Limpieza de Datos (Custodio)
+### 2. **El Che** (Custodio y Limpieza de Datos)
 
 - **Misión:** Sanitizar archivos Word, eliminar metadatos y asegurar la privacidad antes de la venta.
-- **Estado:** ✅ Inicializado.
+- **Estado:** ✅ Limpiando Planificación Octubre.
 - **Ubicación:** `agents/limpieza_datos/`
 
-### 3. Agente Publicador ProfeSocial (E-commerce)
+### 3. **Lenin** (Publicador ProfeSocial)
 
 - **Misión:** Subir los materiales limpios a ProfeSocial, configurar precios, títulos y descripciones.
-- **Estado:** ✅ Inicializado. Esperando credenciales y primer archivo.
+- **Estado:** ✅ Esperando material limpio de El Che.
 - **Ubicación:** `agents/publicador_profesocial/`
 
-### 4. Agente Analista de Cobertura Curricular (Estratega)
+### 4. **Stalin** (Estratega de Cobertura Curricular)
 
 - **Misión:** Analizar Google Drive y Repositorio Local para identificar brechas de contenido y asegurar la cobertura del 100% del currículo.
-- **Estado:** ✅ Inicializado.
+- **Estado:** ✅ Escaneando 1° Medio.
 - **Ubicación:** `agents/analista_curriculum/`
 
-### 5. Agente Especialista en Marketing y Tendencias (Growth)
+### 5. **Xi Jinping** (Estratega de Mercado y Marketing)
 
-- **Misión:** Investigar ProfeSocial y otras plataformas para detectar materiales más vendidos, sugerir nuevos títulos de alta conversión e identificar nichos de mercado.
+- **Misión:** Investigar ProfeSocial para detectar materiales más vendidos y sugerir nuevos títulos de alta conversión.
 - **Estado:** ✅ Inicializado.
 - **Ubicación:** `agents/marketing/`
 
-### 6. Agente Asistente Personal y Gestor de Correo
+### 6. **Putin** (Nexo Personal y Comunicaciones)
 
-- **Misión:** Filtrar inbox, identificar urgencias, rastrear ventas de ProfeSocial y redactar respuestas mimetizando la voz del humano.
+- **Misión:** Monitor de email, filtrado de urgencias y asistente de agenda.
 - **Estado:** ✅ Inicializado.
 - **Ubicación:** `agents/asistente_personal/`
 
-### 7. Agente Gestor Financiero (Contador)
+### 7. **Marx** (Gestor Financiero / Contador)
 
-- **Misión:** Extraer datos de imágenes de boletas, organizar archivos contables y gestionar el registro de adquisiciones en Excel para colegios y negocios.
+- **Misión:** Extraer datos de imágenes de boletas y gestionar el registro de adquisiciones en Excel.
 - **Estado:** ✅ Inicializado.
 - **Ubicación:** `agents/gestor_financiero/`
 
-### 8. Agente Especialista en Encuestas e Insights (Analista)
+### 8. **Mao** (Diseñador de Insights e Invitaciones)
 
-- **Misión:** Diseñar encuestas psicosociales y educativas visualmente atractivas, gestionar la recolección online y generar dashboards de resultados estéticos.
+- **Misión:** Diseñar encuestas psicosociales y educativas visualmente atractivas y generar dashboards estéticos.
 - **Estado:** ✅ Inicializado.
 - **Ubicación:** `agents/especialista_encuestas/`
 
-### 9. Agente Visualizador de Datos y Generador Web
+### 9. **Ho Chi Minh** (Arquitecto de Datos y Web)
 
-- **Misión:** Transformar datos de Excel (notas, asistencia) en páginas web responsivas y dashboards para la comunidad educativa.
+- **Misión:** Transformar datos de Excel (notas, asistencia) en páginas web responsivas y dashboards.
 - **Estado:** ✅ Inicializado.
 - **Ubicación:** `agents/visualizador_datos_web/`
 
-### 10. Agente de Soporte y CRM
+### 10. **Allende** (Soporte y CRM)
 
-- **Misión:** Atender usuarios y gestionar el pipeline en el CRM de Google Sheets.
+- **Misión:** Atender usuarios y gestionar el pipeline en el CRM de Google Sheets con enfoque social y comunitario.
+- **Estado:** ✅ Inicializado.
+- **Ubicación:** `agents/soporte_crm/`
 
 ---
 

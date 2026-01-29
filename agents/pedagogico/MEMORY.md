@@ -8,8 +8,9 @@
 
 ## 📋 Registro de Tareas
 
-- [ ] Esperando carga de "Planificación Clase a Clase" inicial.
-- [ ] Definir plantilla de diseño para las futuras guías.
+- [ ] Auditoría Curricular: Guías 1 a 4 de Comprensión de Texto (Unidad 4 - Lenguaje 1° Medio).
+- [ ] Auditoría de Contenido: Guía "La Noticia" y "Análisis de Noticia".
+- [ ] Sugerencia de mejoras DUA para los materiales de Octubre.
 
 ---
 

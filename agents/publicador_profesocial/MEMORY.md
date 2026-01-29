@@ -16,7 +16,7 @@
 
 ## 📋 Registro de Publicaciones
 
-- [ ] Esperando primer recurso sanitizado para subir a ProfeSocial.
+- [/] En espera: Planificaciones de 1° Medio Lenguaje (Unidad 4) siendo sanitizadas por **Custodio**.
 
 ---
 
