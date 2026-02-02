@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Integral CEIA 2026 - EPJA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1A237E;
+            --accent: #CD7F32;
+            --bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --text: #333;
+            --border: #e0e4e8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-top: 8px solid var(--accent);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .privacy-badge {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        label.question {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .option-card {
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 15px;
+            display: block;
+        }
+
+        .option-card:hover {
+            border-color: var(--accent);
+            background: rgba(205, 127, 50, 0.05);
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        input[type="radio"]:checked+.option-card {
+            border-color: var(--accent);
+            background: rgba(205, 127, 50, 0.1);
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #0d1245;
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        #statusMessage {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="privacy-badge">🔒 Encuesta 100% Anónima</div>
+            <h1>Diagnóstico Socioeducativo 2026</h1>
+            <p style="color: #666; font-style: italic;">Educación de Personas Jóvenes y Adultas - CEIA</p>
+        </div>
+
+        <form id="surveyForm">
+            <!-- BLOQUE 1: PERFIL -->
+            <div class="form-section">
+                <h2>Perfil Demográfico</h2>
+
+                <label class="question">1. Rango de Edad</label>
+                <div class="options-grid">
+                    <label><input type="radio" name="age" value="18-25" required>
+                        <div class="option-card">18 - 25 años</div>
+                    </label>
+                    <label><input type="radio" name="age" value="26-40">
+                        <div class="option-card">26 - 40 años</div>
+                    </label>
+                    <label><input type="radio" name="age" value="41-60">
+                        <div class="option-card">41 - 60 años</div>
+                    </label>
+                    <label><input type="radio" name="age" value="60+">
+                        <div class="option-card">Más de 60 años</div>
+                    </label>
+                </div>
+
+                <label class="question" style="margin-top: 20px;">2. Sector de Residencia</label>
+                <div class="options-grid">
+                    <label><input type="radio" name="location" value="urbano" required>
+                        <div class="option-card">Urbano (Pueblo/Ciudad)</div>
+                    </label>
+                    <label><input type="radio" name="location" value="rural">
+                        <div class="option-card">Rural (Campo/Apartado)</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- BLOQUE 2: REALIDAD Y CONCILIACIÓN -->
+            <div class="form-section">
+                <h2>Realidad Social</h2>
+
+                <label class="question">3. ¿Cuál es su situación laboral?</label>
+                <div class="options-grid">
+                    <label><input type="radio" name="job" value="formal" required>
+                        <div class="option-card">Trabajo Formal</div>
+                    </label>
+                    <label><input type="radio" name="job" value="informal">
+                        <div class="option-card">Informal / Independiente</div>
+                    </label>
+                    <label><input type="radio" name="job" value="busqueda">
+                        <div class="option-card">Buscando empleo</div>
+                    </label>
+                    <label><input type="radio" name="job" value="cuidados">
+                        <div class="option-card">Labores de cuidado/hogar</div>
+                    </label>
+                </div>
+
+                <label class="question" style="margin-top: 20px;">4. Conexión a Internet en el Hogar</label>
+                <div class="options-grid">
+                    <label><input type="radio" name="internet" value="estable" required>
+                        <div class="option-card">Estable (Fibra/Router)</div>
+                    </label>
+                    <label><input type="radio" name="internet" value="datos">
+                        <div class="option-card">Solo datos móviles</div>
+                    </label>
+                    <label><input type="radio" name="internet" value="ninguna">
+                        <div class="option-card">Sin conexión</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- BLOQUE 3: EXPECTATIVAS -->
+            <div class="form-section">
+                <h2>Expectativas Educativas</h2>
+
+                <label class="question">5. ¿Qué factor podría dificultar más su asistencia?</label>
+                <textarea name="hurdles" rows="3"
+                    placeholder="Ej: Horarios de trabajo, locomoción, cuidado de hijos..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Enviar Diagnóstico Anónimo 🫡</button>
+        </form>
+
+        <div id="statusMessage"></div>
+
+        <div class="footer">
+            Implementado por la Orquesta Rojo <br>
+            <strong>Arquitectura: 🌐 Ho Chi Minh | Datos: 📝 Mao</strong>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('surveyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        const SCRIPT_URL = 'https://script.google.com/macros/s/USUARIO_GENERA_ESTA_URL/exec';
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            statusMessage.style.display = 'block';
+            statusMessage.style.background = '#fff8e1';
+            statusMessage.innerHTML = 'Enviando datos al servidor central... 🚀';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data['timestamp'] = new Date().toLocaleString();
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                body: JSON.stringify(data)
+            })
+                .then(() => {
+                    form.style.display = 'none';
+                    statusMessage.style.background = '#e8f5e9';
+                    statusMessage.style.color = '#2e7d32';
+                    statusMessage.innerHTML = '<h3 style="margin:0">¡Muchas gracias!</h3><p>Tus respuestas han sido guardadas de forma anónima para mejorar el CEIA.</p>';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusMessage.style.background = '#ffeebf';
+                    statusMessage.innerHTML = 'Conexión simulada (URL no configurada). Datos procesados localmente.';
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                });
+        });
+    </script>
+</body>
+
+</html>

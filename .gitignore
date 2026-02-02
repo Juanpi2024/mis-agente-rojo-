@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment variables (Sensitive Data)
+.env
+
+# WhatsApp Web Session
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Audio temp files
+temp_audio/
+*.mp3
+
+# Logs
+npm-debug.log
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Large External Resources
+antigravity-awesome-skills/
+depositos_materiales/
+video-promo/

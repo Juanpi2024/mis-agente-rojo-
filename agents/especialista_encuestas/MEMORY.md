@@ -13,8 +13,9 @@
 ## 📋 Tareas Pendientes
 
 - [ ] Definir la plataforma principal de encuestas (Google Forms + CSS, Typeform, etc.).
-- [ ] Crear el primer prototipo de "Encuesta de Satisfacción Escolar".
+- [x] Crear el primer prototipo de "Encuesta de Bienvenida 2026" (Enfoque Socioemocional).
 - [ ] Establecer el estándar visual (colores, tipografías) para los dashboards.
+- [!] **Hito 02/02:** Diseño de Diagnóstico Inicial 2026 finalizado.
 
 ---
 

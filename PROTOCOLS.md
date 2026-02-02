@@ -16,7 +16,7 @@ Para activar a un agente específico, usa estas frases en tu conversación con M
 | :--- | :--- | :--- |
 | **🍎 Pedagogo** | *crear guía, planificación, clase a clase, material* | "Maestro, toma esta planificación y crea la guía de la Clase 1." |
 | **🛡️ Custodio** | *limpiar, privacidad, metadatos, Word limpio* | "Limpia este archivo Word antes de procesarlo." |
-| **🚀 Publicador** | *publicar, subir, ProfeSocial, vender* | "Publica el material de 8° Básico en mi perfil de ProfeSocial." |
+| **🚀 Publicador** | *publicar, subir, ProfeSocial, vender* | "Publica esto." (Nota: Lenin automatiará todo el formulario en silencio y solo pedirá cargar el archivo final). |
 | **📊 Estratega Curricular** | *cobertura, revisar Drive, qué falta* | "¿Qué unidades nos faltan por cubrir en 4° Medio?" |
 | **📈 Estratega Mercado** | *tendencias, competencia, mejor título* | "¿Qué es lo que más se está vendiendo hoy en ProfeSocial?" |
 | **📧 Nexo Personal** | *correo, email, resumen ventas, urgente* | "¿Tengo correos urgentes o nuevas ventas hoy?" |

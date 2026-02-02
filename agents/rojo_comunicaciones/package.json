@@ -1,0 +1,19 @@
+{
+    "name": "rojo-comunicaciones",
+    "version": "1.0.0",
+    "description": "Módulo de comunicación WhatsApp + Voz para el Agente Rojo",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.12.0",
+        "dotenv": "^16.4.5",
+        "elevenlabs-node": "^1.2.0",
+        "fluent-ffmpeg": "^2.1.3",
+        "nodemailer": "^7.0.13",
+        "qrcode": "^1.5.4",
+        "qrcode-terminal": "^0.12.0",
+        "whatsapp-web.js": "^1.23.0"
+    }
+}

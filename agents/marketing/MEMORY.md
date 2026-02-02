@@ -7,16 +7,22 @@
 
 ## 🏆 Top Ventas Analizados
 
-- [Pendiente primer escaneo de ProfeSocial]
+- [x] Escaneo de Profe.Social (Feb 2026):
+  - Demandado: Guías de Evaluación Diagnóstica y Medios de Comunicación (Unidad 4).
+  - Diferenciador: Etiquetas "DUA" y "Ciudadanía" aumentan el interés visual. 🚀
+  - Palabras Clave: "Fake News", "Análisis Crítico", "Clickbait".
 
 ## 🎯 Nichos de Oportunidad
 
-- [ ] Analizar demanda de materiales para educación ciudadana (cruzar con Civic Watchdog).
+- [x] Analizar demanda de materiales para educación ciudadana: **ALTA**. Los docentes buscan conectar Lenguaje con formación cívica.
 - [ ] Evaluar materiales de contingencia (actualizaciones de leyes o fechas efemérides).
 
 ## 📋 Registro de Sugerencias
 
-- [ ] Proponer los primeros 3 títulos de "Alta Conversión" para el próximo ciclo de producción.
+- [x] Títulos sugeridos para el relanzamiento:
+  1. "Guía DUA: Análisis de Noticias y Fake News 📰 | 1° Medio Unidad 4"
+  2. "Pack Evaluación y Guía: Estructura de la Noticia y Ciudadanía 📝"
+  3. "Taller Crítico: Cazadores de noticias en la era Digital 🚀"
 
 ---
 

@@ -8,6 +8,7 @@
 
 ## 🌐 Proyectos Web en Curso
 
+- [x] Prototipo "Encuesta de Bienvenida EPJA 2026" (HTML/CSS Responsivo).
 - [ ] Template Maestro de "Panel de Resultados por Curso".
 - [ ] Sistema de Visualización de Asistencia Crítica.
 

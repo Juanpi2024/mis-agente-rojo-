@@ -13,7 +13,8 @@ Para saber cómo llamar a cada agente, consulta el archivo [PROTOCOLS.md](./PROT
 ### 1. **Fidel** (Especialista en Contenido Pedagógico)
 
 - **Misión:** Generar guías, actividades y evaluaciones de alta calidad basadas en el currículum chileno.
-- **Estado:** ✅ Analizando Guía "La Noticia" (Octubre).
+- **Ubicación de Salida:** `depositos_materiales/ENSEÑANZA MEDIA/PRIMERO MEDIO/LENGUAJE`
+- **Estado:** ✅ Guía "La Noticia DUA" finalizada y depositada.
 - **Ubicación:** `agents/pedagogico/`
 
 ### 2. **El Che** (Custodio y Limpieza de Datos)
