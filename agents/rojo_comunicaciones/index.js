@@ -6,6 +6,17 @@ const path = require('path');
 const ElevenLabs = require('elevenlabs-node');
 require('dotenv').config();
 
+process.on('uncaughtException', (err) => {
+    console.error('❌ CRASH DETECTADO EN ROJO:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ PROMESA RECHAZADA SIN MANEJO:', reason);
+});
+
+console.log('🚀 Iniciando Agente Rojo (index.js)...');
+
 // --- Configuración e Inicialización ---
 
 // 1. Validar Credenciales
@@ -36,10 +47,31 @@ if (voiceEnabled) {
 
 // 4. Configurar WhatsApp Client
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({ clientId: 'rojo' }),
+    webVersionCache: {
+        type: 'none'  // Desactiva cache para evitar errores
+    },
     puppeteer: {
-        args: ['--no-sandbox']
+        headless: false,  // VISIBLE para debug
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--disable-session-crashed-bubble',
+            '--disable-infobars',
+            '--disable-notifications',
+            '--no-first-run'
+        ],
+        timeout: 120000  // 2 minutos
     }
+});
+
+// Limpieza al cerrar
+process.on('SIGINT', async () => {
+    console.log('\\n🛑 Cerrando Rojo limpiamente...');
+    await client.destroy();
+    process.exit(0);
 });
 
 // --- Personalidad de Rojo ---
@@ -166,6 +198,14 @@ client.on('ready', () => {
     console.log('🔴 ROJO ESTÁ EN LÍNEA Y LISTO PARA LA BATALLA.');
 });
 
+// DEBUG: Listener redundante para descartar problemas con message_create
+client.on('message', async msg => {
+    console.log(`Debug: Evento message recibido. Body: ${msg.body}`);
+    if (msg.body === 'PING') {
+        await msg.reply('PONG from Rojo (message event)');
+    }
+});
+
 client.on('message_create', async msg => {
     // Evitar bucles infinitos: Ignorar mensajes que empiecen con nuestro prefijo de respuesta
     // Opcional: ignorar estados, etc.
@@ -181,7 +221,13 @@ client.on('message_create', async msg => {
 
     // Log para depuración
     const sender = msg.fromMe ? 'YO (Host)' : msg.from;
+    console.log(`Debug: Evento message_create disparado. Type: ${msg.type}, Body: ${msg.body}`);
     console.log(`📩 Mensaje de ${sender}: ${msg.body}`);
+
+    if (msg.body === 'PING') {
+        await msg.reply('PONG from Rojo (message_create)');
+        return;
+    }
 
     // Procesar con Gemini
     const respuestaTexto = await generarRespuestaTexto(msg.from, msg.body);
