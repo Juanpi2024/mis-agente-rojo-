@@ -1,27 +1,78 @@
-# Dependencies
+# ============================================
+# DEPENDENCIES
+# ============================================
 node_modules/
+package-lock.json
 
-# Environment variables (Sensitive Data)
+# ============================================
+# ENVIRONMENT & CREDENTIALS (SENSITIVE DATA)
+# ============================================
 .env
+.env.local
+.env.*.local
 
-# WhatsApp Web Session
+# ============================================
+# WHATSAPP WEB SESSION
+# ============================================
 .wwebjs_auth/
 .wwebjs_cache/
 
+# ============================================
+# TEMPORARY FILES
+# ============================================
 # Audio temp files
 temp_audio/
 *.mp3
 
-# Logs
+# Document temp files
+temp_*.docx
+work_file.docx
+*_temp.docx
+
+# Image temp files (generated during execution)
+qr_code.png
+qr_verify.png
+profesocial_form_filled.png
+profesocial_published.png
+*_error.png
+screenshot_*.png
+
+# ============================================
+# LOGS & DEBUG FILES
+# ============================================
 npm-debug.log
+yarn-debug.log
+yarn-error.log
 logs/
 *.log
 
-# OS
+# ============================================
+# AGENT INTERNAL FILES
+# ============================================
+# Agent brain/memory files (optional - comment if needed)
+.agent/
+C:\Users\Casa\.gemini/
+
+# ============================================
+# OS FILES
+# ============================================
 Thumbs.db
 .DS_Store
+desktop.ini
+*.swp
+*.swo
+*~
 
-# Large External Resources
+# ============================================
+# LARGE EXTERNAL RESOURCES
+# ============================================
 antigravity-awesome-skills/
 depositos_materiales/
 video-promo/
+
+# ============================================
+# BUILD & DISTRIBUTION
+# ============================================
+dist/
+build/
+.cache/
