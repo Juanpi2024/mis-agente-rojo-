@@ -20,7 +20,7 @@ if (fs.existsSync(contactsPath)) {
 /**
  * Envía un correo electrónico, intentando resolver el destinatario por alias
  */
-async function sendEmailAsPutin(target, subject, text, html) {
+async function sendEmailAsPutin(target, subject, text, html, attachmentPath = null) {
     let targetEmail = contacts[target.toLowerCase()];
 
     // Si no está en contacts.json, buscar en CSV
@@ -34,7 +34,17 @@ async function sendEmailAsPutin(target, subject, text, html) {
             targetEmail = target; // Asumir que es un correo directo si no se encuentra
         }
     }
+
+    // Validación de formato de correo simple
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(targetEmail)) {
+        console.error(`❌ [Putin Nexo] Error Crítico: "${targetEmail}" no es una dirección de correo válida.`);
+        console.log('🐻 PUTIN: "Niet. Dirección inválida. Corregir antes de enviar."');
+        return false;
+    }
+
     console.log(`🇷🇺 [Putin Nexo] Iniciando protocolo de comunicación hacia: ${targetEmail}`);
+    if (attachmentPath) console.log(`📎 [Putin Nexo] Adjuntando archivo: ${attachmentPath}`);
 
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -46,24 +56,35 @@ async function sendEmailAsPutin(target, subject, text, html) {
         },
     });
 
-    try {
-        const info = await transporter.sendMail({
-            from: `"Putin (Nexo Communications)" <${process.env.SMTP_USER}>`,
-            to: targetEmail,
-            subject: `[NEXO] ${subject}`,
-            text: text,
-            html: `
-                <div style="font-family: 'Courier New', Courier, monospace; border-left: 5px solid #000; padding: 20px; background-color: #f9f9f9;">
-                    <div style="font-weight: bold; color: #d32f2f; margin-bottom: 10px;">🇷🇺 DISPACHO DE INTELIGENCIA - NEXO</div>
-                    ${html}
-                    <div style="margin-top: 30px; font-size: 0.8em; color: #555;">
-                        --- DOCUMENTO CIFRADO ---<br>
-                        <strong>Agente:</strong> Putin (Nexo)<br>
-                        <strong>Destino:</strong> ${targetEmail}
-                    </div>
+    const mailOptions = {
+        from: `"Putin (Nexo Communications)" <${process.env.SMTP_USER}>`,
+        to: targetEmail,
+        subject: `[NEXO] ${subject}`,
+        text: text,
+        html: `
+            <div style="font-family: 'Courier New', Courier, monospace; border-left: 5px solid #000; padding: 20px; background-color: #f9f9f9;">
+                <div style="font-weight: bold; color: #d32f2f; margin-bottom: 10px;">🇷🇺 DISPACHO DE INTELIGENCIA - NEXO</div>
+                ${html}
+                <div style="margin-top: 30px; font-size: 0.8em; color: #555;">
+                    --- DOCUMENTO CIFRADO ---<br>
+                    <strong>Agente:</strong> Putin (Nexo)<br>
+                    <strong>Destino:</strong> ${targetEmail}
                 </div>
-            `,
-        });
+            </div>
+        `
+    };
+
+    if (attachmentPath && fs.existsSync(attachmentPath)) {
+        mailOptions.attachments = [{
+            filename: path.basename(attachmentPath),
+            path: attachmentPath
+        }];
+    } else if (attachmentPath) {
+        console.warn(`⚠️ [Putin Nexo] El archivo adjunto no existe: ${attachmentPath}`);
+    }
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
         console.log('✅ [Putin Nexo] Comunicación enviada con éxito:', info.messageId);
         console.log('🐻 PUTIN: "Confía, pero verifica. Misión completada."');
         return true;
@@ -100,11 +121,13 @@ if (require.main === module) {
             console.log(res);
         });
     } else if (action === 'send') {
-        // Formato: send "alias/email" "subject" "body"
+        // Formato: send "alias/email" "subject" "body" "attachmentPath"
         const target = process.argv[3];
         const subject = process.argv[4] || "Instrucción de Rojo";
         const body = process.argv[5] || "Sin contenido.";
-        sendEmailAsPutin(target, subject, body, `<p>${body}</p>`).then(res => {
+        const attachment = process.argv[6] || null;
+
+        sendEmailAsPutin(target, subject, body, `<p>${body}</p>`, attachment).then(res => {
             console.log(res ? '✅ OK' : '❌ FALLO');
         });
     }
