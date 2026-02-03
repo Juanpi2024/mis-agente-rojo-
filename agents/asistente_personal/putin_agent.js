@@ -1,4 +1,5 @@
-require('dotenv').config({ path: '../../agents/rojo_comunicaciones/.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../rojo_comunicaciones/.env') });
 const nodemailer = require('nodemailer');
 
 /**

@@ -12,13 +12,18 @@
 - [ ] Auditoría de Contenido: Guía "La Noticia" y "Análisis de Noticia".
 - [ ] Sugerencia de mejoras DUA para los materiales de Octubre.
 
+## 🚀 Logros Institucionales (Ejemplares)
+
+- **Lenin v2.2 (Publicador)**: Motor de publicación masiva validado. Publicación exitosa de Planificaciones 1° Medio (Octubre, Noviembre, Diciembre) a 6 coins.
+- **El Che v2.1 (Limpieza)**: Algoritmo de limpieza profunda emulando el Inspector de Documentos de Word (elimina autor, macros, XML personalizado).
+
 ---
 
 ## 🛠️ Herramientas Sugeridas (Handheld by Maestro)
 
-- Generación de guías en Markdown.
-- Creación de actividades tipo DARE o DUA (Diseño Universal de Aprendizaje).
-- Insumos de Civic Watchdog para materiales de Educación Ciudadana.
+- **Lenin Bulk**: Script `publish_bulk.js` para subida masiva sin permisos/confirmación.
+- **El Che Deep**: Módulo `docx-cleaner.js` para sanitización prolija de metadatos.
+- **DUA Directo**: Inserción de HTML enriquecido en Trix (ProfeSocial).
 
 ## 🔴 PROTOCOLO CRÍTICO DE NIVEL (DOCTRINA ACTUALIZADA)
 
