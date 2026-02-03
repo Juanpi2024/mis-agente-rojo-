@@ -1,0 +1,14 @@
+{
+    "name": "gladys-marin-agent",
+    "version": "1.0.0",
+    "description": "Especialista en búsqueda y formateo de información",
+    "main": "agent.js",
+    "scripts": {
+        "start": "node agent.js",
+        "test": "node agent.js \"Prueba de Sistema\" \"formal\""
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "nodemailer": "^6.9.16"
+    }
+}
