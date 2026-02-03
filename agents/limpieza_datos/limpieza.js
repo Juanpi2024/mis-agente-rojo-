@@ -238,52 +238,52 @@ async function main() {
             }
 
             console.log(`\n${C.bold}Resultado:${C.reset} ${cleaned} limpiados, ${errors} errores.`);
-        }
-        return;
-    }
-
-    // === DEEP ===
-    if (command === '--deep') {
-        const targetPath = args[1];
-
-        if (!targetPath) {
-            console.log(`${C.red}❌ Debes especificar un archivo para limpieza profunda.${C.reset}`);
-            console.log(`${C.dim}Ejemplo: node limpieza.js --deep "C:\\ruta\\archivo.docx"${C.reset}`);
+            console.log('☭ STALIN: "No hay hombre, no hay problema. Datos limpios."');
             return;
         }
 
-        console.log(`\n${C.cyan}${C.bold}🛡️ EL CHE: Limpieza profunda OOXML...${C.reset}\n`);
+        // === DEEP ===
+        if (command === '--deep') {
+            const targetPath = args[1];
 
-        // Mostrar metadatos antes
-        const metaBefore = await analyzeMetadata(targetPath);
-        console.log(`${C.bold}Antes:${C.reset}`);
-        console.log(`   Autor: ${metaBefore.creator || '(vacío)'}`);
-        console.log(`   Modificado por: ${metaBefore.lastModifiedBy || '(vacío)'}`);
-        console.log(`   Empresa: ${metaBefore.company || '(vacío)'}`);
-        console.log(`   Comentarios: ${metaBefore.commentsCount || 0}`);
-        console.log('');
+            if (!targetPath) {
+                console.log(`${C.red}❌ Debes especificar un archivo para limpieza profunda.${C.reset}`);
+                console.log(`${C.dim}Ejemplo: node limpieza.js --deep "C:\\ruta\\archivo.docx"${C.reset}`);
+                return;
+            }
 
-        const result = await cleanDeep(targetPath);
-        printCleanResult(result);
+            console.log(`\n${C.cyan}${C.bold}🛡️ EL CHE: Limpieza profunda OOXML...${C.reset}\n`);
 
-        if (result.success) {
-            // Mostrar metadatos después
-            const metaAfter = await analyzeMetadata(result.outputPath);
-            console.log(`\n${C.bold}Después:${C.reset}`);
-            console.log(`   Autor: ${metaAfter.creator || '(vacío)'}`);
-            console.log(`   Modificado por: ${metaAfter.lastModifiedBy || '(vacío)'}`);
-            console.log(`   Empresa: ${metaAfter.company || '(vacío)'}`);
-            console.log(`   Comentarios: ${metaAfter.commentsCount || 0}`);
+            // Mostrar metadatos antes
+            const metaBefore = await analyzeMetadata(targetPath);
+            console.log(`${C.bold}Antes:${C.reset}`);
+            console.log(`   Autor: ${metaBefore.creator || '(vacío)'}`);
+            console.log(`   Modificado por: ${metaBefore.lastModifiedBy || '(vacío)'}`);
+            console.log(`   Empresa: ${metaBefore.company || '(vacío)'}`);
+            console.log(`   Comentarios: ${metaBefore.commentsCount || 0}`);
+            console.log('');
+
+            const result = await cleanDeep(targetPath);
+            printCleanResult(result);
+
+            if (result.success) {
+                // Mostrar metadatos después
+                const metaAfter = await analyzeMetadata(result.outputPath);
+                console.log(`\n${C.bold}Después:${C.reset}`);
+                console.log(`   Autor: ${metaAfter.creator || '(vacío)'}`);
+                console.log(`   Modificado por: ${metaAfter.lastModifiedBy || '(vacío)'}`);
+                console.log(`   Empresa: ${metaAfter.company || '(vacío)'}`);
+                console.log(`   Comentarios: ${metaAfter.commentsCount || 0}`);
+            }
+            return;
         }
-        return;
+
+        // Comando no reconocido
+        console.log(`${C.red}❌ Comando no reconocido: ${command}${C.reset}`);
+        console.log(`${C.dim}Usa --help para ver los comandos disponibles.${C.reset}`);
     }
 
-    // Comando no reconocido
-    console.log(`${C.red}❌ Comando no reconocido: ${command}${C.reset}`);
-    console.log(`${C.dim}Usa --help para ver los comandos disponibles.${C.reset}`);
-}
-
-main().catch(err => {
-    console.error(`${C.red}❌ Error fatal: ${err.message}${C.reset}`);
-    process.exit(1);
-});
+    main().catch(err => {
+        console.error(`${C.red}❌ Error fatal: ${err.message}${C.reset}`);
+        process.exit(1);
+    });

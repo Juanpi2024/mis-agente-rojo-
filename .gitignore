@@ -76,3 +76,9 @@ video-promo/
 dist/
 build/
 .cache/
+
+# SECURITY - API Keys
+.env
+*.env
+.env.*
+

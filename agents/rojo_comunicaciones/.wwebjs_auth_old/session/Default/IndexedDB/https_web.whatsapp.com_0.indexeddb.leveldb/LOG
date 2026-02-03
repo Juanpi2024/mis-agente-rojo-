@@ -1,0 +1,20 @@
+2026/02/03-01:00:14.664 3a34 Reusing MANIFEST C:\Users\Casa\clawd\agents\rojo_comunicaciones\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/02/03-01:00:14.664 3a34 Recovering log #130
+2026/02/03-01:00:14.711 3a34 Reusing old log C:\Users\Casa\clawd\agents\rojo_comunicaciones\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000130.log 
+2026/02/03-01:00:17.815 3a34 Level-0 table #139: started
+2026/02/03-01:00:17.863 3a34 Level-0 table #139: 1199937 bytes OK
+2026/02/03-01:00:17.865 3a34 Delete type=0 #130
+2026/02/03-01:00:17.889 44ac Compacting 1@1 + 5@2 files
+2026/02/03-01:00:17.997 44ac Generated table #140@1: 55036 keys, 2242420 bytes
+2026/02/03-01:00:18.027 44ac Generated table #141@1: 2620 keys, 2149327 bytes
+2026/02/03-01:00:18.115 44ac Generated table #142@1: 29688 keys, 2216216 bytes
+2026/02/03-01:00:18.197 44ac Generated table #143@1: 69669 keys, 2210513 bytes
+2026/02/03-01:00:18.275 44ac Generated table #144@1: 91987 keys, 2121759 bytes
+2026/02/03-01:00:18.275 44ac Compacted 1@1 + 5@2 files => 10940235 bytes
+2026/02/03-01:00:18.276 44ac compacted to: files[ 0 0 5 0 0 0 0 ]
+2026/02/03-01:00:18.276 44ac Delete type=2 #132
+2026/02/03-01:00:18.276 44ac Delete type=2 #133
+2026/02/03-01:00:18.277 44ac Delete type=2 #134
+2026/02/03-01:00:18.277 44ac Delete type=2 #135
+2026/02/03-01:00:18.277 44ac Delete type=2 #136
+2026/02/03-01:00:18.277 44ac Delete type=2 #139

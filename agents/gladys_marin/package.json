@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "dotenv": "^16.4.7",
-        "nodemailer": "^6.9.16"
+        "nodemailer": "^6.9.16",
+        "openai": "^6.17.0"
     }
 }

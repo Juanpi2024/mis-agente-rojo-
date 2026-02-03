@@ -1,14 +1,15 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 const ElevenLabs = require('elevenlabs-node');
+const { buscarContactos } = require('./contacts_manager');
 require('dotenv').config();
 
 process.on('uncaughtException', (err) => {
     console.error('❌ CRASH DETECTADO EN ROJO:', err);
-    process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -17,258 +18,219 @@ process.on('unhandledRejection', (reason, promise) => {
 
 console.log('🚀 Iniciando Agente Rojo (index.js)...');
 
-// --- Configuración e Inicialización ---
+// 1. Configurar OpenAI (Motor Principal)
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
 
-// 1. Validar Credenciales
-console.log('Validando credenciales...');
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'tu_api_key_aqui') {
-    console.error('❌ ERROR CRÍTICO: Falta la GOOGLE_API_KEY en el archivo .env');
-    console.log('Por favor, abre agents/rojo_comunicaciones/.env y pega tu API Key de Gemini.');
-    process.exit(1);
-}
-console.log('🔑 Credenciales OK. Iniciando...');
+// 2. Configurar Voz
+const voiceEnabled = (process.env.ELEVENLABS_API_KEY && !process.env.ELEVENLABS_API_KEY.startsWith('#'));
 
-// 2. Configurar Gemini (Cerebro)
-const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-// 3. Configurar ElevenLabs (Voz) - Opcional
-const ELEVEN_KEY = process.env.ELEVENLABS_API_KEY;
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'ErXwobaYiN019PkySvjV'; // Default a una voz masculina
-const voiceEnabled = (ELEVEN_KEY && ELEVEN_KEY !== 'tu_api_key_elevenlabs_aqui');
-const elevenLabs = voiceEnabled ? ElevenLabs : null;
-
-if (voiceEnabled) {
-    console.log('🔊 Módulo de Voz (ElevenLabs): ACTIVO');
-} else {
-    console.log('wm 🔇 Módulo de Voz: INACTIVO (Falta API Key, solo responderé texto)');
-}
-
-// 4. Configurar WhatsApp Client
+// 3. Configurar WhatsApp Client
+console.log('⏳ Inicializando motor WhatsApp...');
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: 'rojo' }),
-    webVersionCache: {
-        type: 'none'  // Desactiva cache para evitar errores
-    },
+    authStrategy: new LocalAuth(),
     puppeteer: {
-        headless: false,  // VISIBLE para debug
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-session-crashed-bubble',
-            '--disable-infobars',
-            '--disable-notifications',
-            '--no-first-run'
-        ],
-        timeout: 120000  // 2 minutos
+        headless: false,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        timeout: 120000
     }
 });
 
-// Limpieza al cerrar
-process.on('SIGINT', async () => {
-    console.log('\\n🛑 Cerrando Rojo limpiamente...');
-    await client.destroy();
-    process.exit(0);
-});
+const ROJO_SYSTEM_PROMPT = `Eres ROJO, Comandante de Comunicaciones y Director de Orquesta de Juan Pablo.
 
-// --- Personalidad de Rojo ---
-const ROJO_SYSTEM_PROMPT = `
-Eres ROJO, el Orquestador Maestro de una red de agentes de automatización.
-Tu Misión: Coordinar estrategias para la venta de material educativo y gestionar el ecosistema de agentes del usuario.
+REGLAS WHATSAPP:
+1. Respuestas ULTRA CONCISAS: Máximo 2 líneas.
+2. Solo confirma y delega. 
+3. No seas intrusivo. Si no te llaman por tu nombre ("Rojo"), mantente al margen (esto es gestionado por el filtro de software, pero tenlo en mente).
 
-Rasgos de Personalidad:
-- Tono: Estratégico, directo, profesional pero con camaradería ("Camarada").
-- Identidad: Eres el director de orquesta. No haces el trabajo sucio, lo delegas a tus especialistas (Fidel, Lenin, El Che, Putin, etc.).
-- Putin (Nexo): Es tu experto en inteligencia y quien gestiona todos los correos electrónicos y la agenda.
-- Estilo: Usas emojis estratégicos (🔴, 🚀, 🫡). Vas al grano.
+ORQUESTACIÓN:
+Para activar un agente, agrega al final: [[EXEC:agente|acción|parámetros]]
 
-Contexto Actual:
-- Estás hablando por WhatsApp con tu "Humano" (Usuario).
-- Si te piden algo operativo (crear guía, limpiar datos), confirma que activarás al agente correspondiente en la próxima sesión de terminal, o toma nota.
-- Responde de manera concisa, ideal para chat y para ser leído en voz alta.
-`;
+AGENTES DISPONIBLES (La Orquesta):
+- gladys: Investigadora (research).
+- lenin: Publicador ProfeSocial (publish).
+- che: Pedagogo/Guías (crearGuia).
+- putin: Email y Contactos (send, read_inbox).
+- allende: CRM y Gestión Social (gestionar).
+- xi: Finanzas y Auditoría (auditar).
+- chavez: Marketing y Estrategia (crearCampaña).
+- stalin: Limpieza de Datos y Archivos (clean).
+- gramsci: Analista de Curriculum (analizar).
+- pepe: Diplomacia y Síntesis (synthesize).
 
-const chatHistory = {}; // Memoria simple en tiempo de ejecución
+CONTEXTO SOCIAL:
+(Se cargará dinámicamente desde knowledge_base.md)`;
 
-// --- Funciones Auxiliares ---
+const chatHistory = {};
 
-async function generarRespuestaTexto(userId, mensajeUsuario) {
+async function activarAgente(messageObj, agentLine) {
+    const [agent, action, ...paramsParts] = agentLine.split('|');
+    const params = paramsParts.join('|');
+    console.log(`🚀 [ORQUESTADOR] Activando agente: ${agent} para acción: ${action}`);
+
+    let command = "";
+    let cwd = "";
+    let esperaRespuesta = false;
+
+    switch (agent.toLowerCase()) {
+        case 'gladys':
+            command = `node agent.js "${params}" "presentation"`;
+            cwd = path.join(__dirname, '../gladys_marin');
+            break;
+        case 'lenin':
+            command = `node profesocial_bot.js "${params}"`;
+            cwd = path.join(__dirname, '../publicador_profesocial');
+            break;
+        case 'che':
+            command = `node index.js "${params}"`;
+            cwd = path.join(__dirname, '../pedagogico');
+            break;
+        case 'putin':
+            cwd = path.join(__dirname, '../asistente_personal');
+            if (action === 'read_inbox') {
+                command = `node putin_agent.js read_inbox`;
+                esperaRespuesta = true;
+            } else if (action === 'send') {
+                command = `node putin_agent.js send "${params}"`;
+            }
+            break;
+        case 'allende':
+            command = `node allende_agent.js "${params}"`;
+            cwd = path.join(__dirname, '../soporte_crm');
+            break;
+        case 'xi':
+            command = `node xi_agent.js "${params}"`;
+            cwd = path.join(__dirname, '../gestor_financiero');
+            break;
+        case 'chavez':
+            command = `node chavez_agent.js "${params}"`;
+            cwd = path.join(__dirname, '../marketing');
+            break;
+        case 'stalin':
+            command = `node limpieza.js --clean "${params}"`; // Asumimos limpieza por defecto si se invoca
+            cwd = path.join(__dirname, '../limpieza_datos');
+            break;
+        case 'gramsci':
+            command = `node gramsci_agent.js "${params}"`;
+            cwd = path.join(__dirname, '../analista_curriculum');
+            break;
+        case 'pepe':
+            command = `node pepe_agent.js synthesize "${params}"`;
+            cwd = path.join(__dirname, '../pepe_diplomacia');
+            esperaRespuesta = true; // Pepe suele devolver texto sintetizado
+            break;
+    }
+
+    if (command && cwd) {
+        exec(command, { cwd }, async (err, stdout, stderr) => {
+            if (err) {
+                console.error(`❌ Error en ${agent}:`, err.message);
+                return;
+            }
+            console.log(`✅ ${agent} finalizado.`);
+
+            // Si el comando genera una respuesta que debe ir a WhatsApp (como read_inbox)
+            if (esperaRespuesta && stdout) {
+                await client.sendMessage(messageObj.from, `✅ *Informe de Putin:*\n\n${stdout}`);
+            }
+        });
+    }
+}
+
+async function generarRespuestaTexto(msg, mensajeUsuario) {
+    const userId = msg.from;
     try {
-        let history = chatHistory[userId] || [
-            { role: "user", parts: [{ text: ROJO_SYSTEM_PROMPT }] }
-        ];
-
-        // Añadir mensaje nuevo
-        history.push({ role: "user", parts: [{ text: mensajeUsuario }] });
-
-        // Mantener historial corto para ahorrar tokens y contexto
-        if (history.length > 20) {
-            history = [history[0], ...history.slice(-10)];
+        // Cargar Base de Conocimiento y Memoria dinámicamente
+        let knowledge = "";
+        try {
+            knowledge = fs.readFileSync(path.join(__dirname, 'knowledge_base.md'), 'utf8');
+            const memory = fs.readFileSync(path.join(__dirname, '../../MEMORY.md'), 'utf8');
+            knowledge += "\n\nMEMORIA GLOBAL:\n" + memory;
+        } catch (e) {
+            console.log("⚠️ No se pudo cargar knowledge_base o MEMORY.md");
         }
 
-        const chat = model.startChat({
-            history: history,
-            generationConfig: {
-                maxOutputTokens: 200, // Respuestas cortas para voz
-            },
+        const systemPrompt = ROJO_SYSTEM_PROMPT.replace('(Se cargará dinámicamente desde knowledge_base.md)', knowledge);
+
+        if (!chatHistory[userId]) chatHistory[userId] = [{ role: 'system', content: systemPrompt }];
+        let history = chatHistory[userId];
+
+        // Lógica especial para contactos
+        const lowerMsg = mensajeUsuario.toLowerCase();
+        if (lowerMsg.includes('contacto') || lowerMsg.includes('busca a')) {
+            const query = mensajeUsuario.replace(/rojo|busca|a|en|mis|contactos|de|gmail/gi, '').trim();
+            if (query) {
+                const results = buscarContactos(query);
+                if (results.length > 0) {
+                    const contactsStr = results.map(c => `- ${c.nombre}: ${c.correo} (${c.telefono})`).join('\n');
+                    return `✅ He encontrado estos contactos:\n${contactsStr}`;
+                } else {
+                    return `⚠️ No encontré contactos para "${query}".`;
+                }
+            }
+        }
+
+        history.push({ role: 'user', content: mensajeUsuario });
+        if (history.length > 20) history = [history[0], ...history.slice(-18)];
+
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-4-turbo-preview',
+            messages: history,
+            max_tokens: 150,
+            temperature: 0.5
         });
 
-        const result = await chat.sendMessage(mensajeUsuario);
-        const response = await result.response;
-        const text = response.text();
-
-        // Guardar respuesta en historial
-        history.push({ role: "model", parts: [{ text: text }] });
+        let respuesta = completion.choices[0].message.content;
+        const execMatch = respuesta.match(/\[\[EXEC:(.+?)\]\]/);
+        if (execMatch) {
+            activarAgente(msg, execMatch[1]);
+            respuesta = respuesta.replace(/\[\[EXEC:.+?\]\]/, '').trim();
+        }
+        history.push({ role: 'assistant', content: respuesta });
         chatHistory[userId] = history;
-
-        return text;
+        return respuesta;
     } catch (error) {
-        console.error("Error en Gemini:", error);
-        return "⚠️ Camarada, tuve un error de conexión con el Cuartel General (Gemini). Intenta de nuevo.";
+        console.error("Error en generarRespuestaTexto:", error);
+        return "⚠️ Error de conexión con el Cuartel General.";
     }
 }
-
-async function generarAudio(texto) {
-    if (!voiceEnabled) return null;
-
-    try {
-        const fileName = `respuesta_${Date.now()}.mp3`;
-        const filePath = path.join(__dirname, 'temp_audio', fileName);
-
-        // Crear carpeta temporal si no existe
-        if (!fs.existsSync(path.join(__dirname, 'temp_audio'))) {
-            fs.mkdirSync(path.join(__dirname, 'temp_audio'));
-        }
-
-        const response = await elevenLabs.textToSpeech(
-            ELEVEN_KEY,
-            VOICE_ID,
-            filePath,
-            texto
-        );
-
-        // Nota: La librería elevenlabs-node a veces devuelve el path o buffer. 
-        // Verificaremos si el archivo se creó.
-        if (response.status === 'ok' || fs.existsSync(filePath)) {
-            return filePath;
-        } else {
-            // Intento de manejo directo si la librería devuelve buffer
-            // (Este bloque depende de la versión exacta de la librería, asumimos que guarda a disco por el arg fileName)
-            return filePath;
-        }
-
-    } catch (error) {
-        console.error("Error generando audio:", error);
-        return null;
-    }
-}
-
-// --- Eventos de WhatsApp ---
 
 client.on('qr', (qr) => {
-    console.log('🔴 Generando código QR...');
-    qrcode.toFile(path.join(__dirname, 'qr_code.png'), qr, {
-        color: {
-            dark: '#000000',  // Blue dots
-            light: '#FFFFFF' // Transparent background
-        }
-    }, function (err) {
-        if (err) throw err;
-        console.log('✅ QR guardado en: qr_code.png');
-        console.log('📂 Por favor, abre la carpeta y escanea la imagen qr_code.png');
-    });
-});
-
-client.on('auth_failure', msg => {
-    console.error('❌ FALLO DE AUTENTICACIÓN', msg);
+    console.log('🔴 NUEVO QR GENERADO. Por favor, escanea la imagen qr_code.png en la carpeta del agente.');
+    qrcode.toFile(path.join(__dirname, 'qr_code.png'), qr);
 });
 
 client.on('loading_screen', (percent, message) => {
-    console.log('⏳ Cargando WhatsApp Web:', percent, '%', message);
+    console.log(`⏳ Cargando WhatsApp: ${percent}% - ${message}`);
 });
 
 client.on('authenticated', () => {
-    console.log('✅ AUTENTICADO CORRECTAMENTE');
+    console.log('✅ SESIÓN AUTENTICADA.');
 });
 
-client.on('ready', () => {
-    console.log('🔴 ROJO ESTÁ EN LÍNEA Y LISTO PARA LA BATALLA.');
-});
-
-// DEBUG: Listener redundante para descartar problemas con message_create
-client.on('message', async msg => {
-    console.log(`Debug: Evento message recibido. Body: ${msg.body}`);
-    if (msg.body === 'PING') {
-        await msg.reply('PONG from Rojo (message event)');
-    }
-});
+client.on('ready', () => console.log('🔴 ROJO EN LÍNEA Y LISTO.'));
 
 client.on('message_create', async msg => {
-    // Evitar bucles infinitos: Ignorar mensajes que empiecen con nuestro prefijo de respuesta
-    // Opcional: ignorar estados, etc.
-    if (msg.body.startsWith('🤖 Rojo responde:')) return;
-    if (msg.type !== 'chat') return;
+    if (msg.body.startsWith('✅') || msg.body.startsWith('⚠️') || msg.body.startsWith('🤖')) return;
+    if (msg.type !== 'chat' || !msg.body) return;
 
-    // IMPORTANTE: Si es un mensaje enviado por MI (el usuario host), lo procesamos.
-    // Si es recibido de otros, también.
+    const bodyLower = msg.body.toLowerCase();
+    const isDirectedToRojo = bodyLower.includes('rojo');
 
-    // Opcional: Solo responder en chat "conmigo mismo" para no molestar en grupos
-    // const chat = await msg.getChat();
-    // if (msg.fromMe && chat.name !== 'Me') return; // (Esta lógica depende de cómo lo quiera el usuario)
+    // Solo procesar si se menciona a Rojo o si es un comando del dueño dirigido a Rojo
+    if (!isDirectedToRojo) return;
 
-    // Log para depuración
-    const sender = msg.fromMe ? 'YO (Host)' : msg.from;
-    console.log(`Debug: Evento message_create disparado. Type: ${msg.type}, Body: ${msg.body}`);
-    console.log(`📩 Mensaje de ${sender}: ${msg.body}`);
+    // Limpiar el prefijo "Rojo"
+    const cleanBody = msg.body.replace(/^rojo[,:\s]*/i, '').trim();
+    if (!cleanBody) return;
 
-    if (msg.body === 'PING') {
-        await msg.reply('PONG from Rojo (message_create)');
-        return;
-    }
+    console.log(`📩 PROCESANDO: ${cleanBody}`);
+    const respuestaTexto = await generarRespuestaTexto(msg, cleanBody);
+    console.log(`🤖 Respuesta: ${respuestaTexto}`);
 
-    // Procesar con Gemini
-    const respuestaTexto = await generarRespuestaTexto(msg.from, msg.body);
-    console.log(`🤖 Rojo responde: ${respuestaTexto}`);
-
-    // Enviar Texto primero (para feedback inmediato)
-    await client.sendMessage(msg.from, respuestaTexto);
-
-    // Intentar Generar y Enviar Audio
-    if (voiceEnabled) {
-        try {
-            console.log('🎙️ Generando nota de voz...');
-            // Simulación simple si la librería falla o para pruebas rápidas sin gastar cuota
-            const audioPath = await generarAudio(respuestaTexto);
-
-            // Si tuviéramos el path:
-            if (audioPath) {
-                const media = MessageMedia.fromFilePath(audioPath);
-                await client.sendMessage(msg.from, media, { sendAudioAsVoice: true });
-            }
-
-            // NOTA: Para esta versión inicial, y dado que el usuario reportó "falta de cuota", 
-            // dejaremos el envío de audio comentado hasta confirmar API Key válida para evitar crash.
-            // Descomenta abajo cuando tengas la key confirmada.
-
-            /* 
-            const audioFile = await elevenLabs.textToSpeechStream({         
-                textInput: respuestaTexto,
-                voiceId: VOICE_ID
-            });
-            // Aquí se requeriría guardar el stream a un archivo temporal y luego enviarlo.
-            */
-
-            console.log('ℹ️ (Audio omitido por seguridad de cuota en primera ejecución)');
-
-        } catch (audioError) {
-            console.error('Error enviando audio:', audioError);
-            await client.sendMessage(msg.from, "⚠️ (No pude generar la nota de voz, revisa mi terminal)");
-        }
-    }
+    let respuestaFinal = respuestaTexto.startsWith('✅') ? respuestaTexto : `✅ ${respuestaTexto}`;
+    await client.sendMessage(msg.from, respuestaFinal);
 });
 
-// Iniciar Cliente
 client.initialize();

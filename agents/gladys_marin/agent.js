@@ -1,8 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../rojo_comunicaciones/.env') });
+const OpenAI = require('openai');
 const { sendEmailAsPutin } = require('../asistente_personal/putin_agent');
 const generateSlidesHTML = require('./slides_template');
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
 
 /**
  * Gladys Marín - Especialista en Búsqueda y Formateo
@@ -15,57 +20,68 @@ class GladysMarin {
     }
 
     /**
-     * Simula una búsqueda exhaustiva (En un entorno real, esto conectaría con APIs de búsqueda)
-     * @param {string} query 
+     * Realiza una investigación profunda usando Inteligencia Artificial
      */
     async exhaustiveSearch(query) {
-        console.log(`🔍 [${this.name}] Iniciando búsqueda rebelde para: "${query}"...`);
-        // Simulación de resultados encontrados
-        const results = [
-            { source: "Archivo Digital", snippet: `Información detallada sobre ${query} desde una perspectiva histórica.` },
-            { source: "Prensa Independiente", snippet: `Visiones alternativas y críticas sobre ${query}.` },
-            { source: "Base de Datos ProfeSocial", snippet: `Recursos y materiales relacionados con ${query}.` }
-        ];
-        return results;
+        console.log(`🔍 [${this.name}] Iniciando investigación PROFUNDA para: "${query}"...`);
+
+        try {
+            const completion = await openai.chat.completions.create({
+                model: 'gpt-4-turbo-preview',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `Eres Gladys Marín, una investigadora experta, crítica y exhaustiva. 
+                        Tu misión es entregar un informe de inteligencia DETALLADO y FUERTE sobre el tema solicitado.
+                        No entregues respuestas pobres. Busca ángulos históricos, técnicos, sociales y prácticos.
+                        Formato de salida: JSON con un array de objetos {source, snippet}. Mínimo 5 fuentes detalladas.`
+                    },
+                    { role: 'user', content: `Investiga a fondo sobre: ${query}` }
+                ],
+                response_format: { type: "json_object" }
+            });
+
+            const response = JSON.parse(completion.choices[0].message.content);
+            // Si la IA devuelve un objeto con un array dentro, lo extraemos. 
+            // Esperamos algo como { "sources": [...] } o similar.
+            const results = response.sources || response.resultados || response.results || Object.values(response)[0];
+
+            return Array.isArray(results) ? results : [{ source: "Inteligencia Central", snippet: "Error procesando fuentes detalladas, pero la investigación continúa." }];
+
+        } catch (error) {
+            console.error("❌ Error en investigación IA:", error);
+            return [
+                { source: "Archivo Digital", snippet: `Información sobre ${query} (Recuperación de emergencia).` }
+            ];
+        }
     }
 
     /**
      * Formatea la información encontrada
-     * @param {Array} results 
-     * @param {string} format 'formal' | 'creative' | 'presentation' | 'video'
      */
     formatInformation(results, format = 'formal') {
         let content = "";
 
         switch (format) {
             case 'creative':
-                content = `## ✨ Relato Crítico: La Verdad sobre el Tema\n\n`;
+                content = `## ✨ Relato Crítico: Análisis Profundo del Tema\n\n`;
                 results.forEach(r => {
-                    content += `> *Desde ${r.source} emergió una chispa:* ${r.snippet}\n\n`;
+                    content += `### 💥 ${r.source}\n${r.snippet}\n\n`;
                 });
-                content += `\n**Conclusión:** La información no se oculta ante la persistencia.`;
                 break;
 
             case 'presentation':
-                content = `# Propuesta de Presentación\n\n`;
+                content = `# Propuesta de Presentación Detallada\n\n`;
                 results.forEach((r, i) => {
                     content += `## Diapositiva ${i + 1}: ${r.source}\n- ${r.snippet}\n\n`;
                 });
                 break;
 
-            case 'video':
-                content = `# Guion de Video Sugerido\n\n`;
-                content += `**[Escena 1: Intro]** Cámara fija. Gladys mira a cámara.\n *Texto:* "Hoy vamos a revelar lo que encontramos sobre..."\n\n`;
-                results.forEach(r => {
-                    content += `**[Escena: ${r.source}]** Insertar gráficos.\n *Voz en off:* ${r.snippet}\n\n`;
-                });
-                break;
-
             case 'formal':
             default:
-                content = `# Informe de Inteligencia: ${new Date().toLocaleDateString()}\n\n`;
+                content = `# 📄 INFORME DE INTELIGENCIA ESTRATÉGICA: ${new Date().toLocaleDateString()}\n\n`;
                 results.forEach(r => {
-                    content += `### Fuente: ${r.source}\n- ${r.snippet}\n\n`;
+                    content += `### 🏢 Fuente: ${r.source}\n${r.snippet}\n\n---\n`;
                 });
                 break;
         }
@@ -76,12 +92,12 @@ class GladysMarin {
     /**
      * Ejecuta el flujo completo: Buscar -> Formatear -> Enviar
      */
-    async runMission(query, format = 'formal', targetEmail = 'yek.patty@gmail.com') {
+    async runMission(query, format = 'formal', targetEmail = 'profepablo2010@gmail.com') {
         const results = await this.exhaustiveSearch(query);
         let formattedContent = this.formatInformation(results, format);
         let presentationLink = "";
 
-        // Si es formato presentación, generamos el archivo HTML premium
+        // Si es formato presentación, generamos el archivo HTML
         if (format === 'presentation') {
             const htmlSlides = generateSlidesHTML(query, results);
             const outputDir = path.join(__dirname, 'outputs');
@@ -91,35 +107,54 @@ class GladysMarin {
             const filePath = path.join(outputDir, fileName);
             fs.writeFileSync(filePath, htmlSlides);
 
-            presentationLink = `<p style="background: #fdf2f2; padding: 15px; border-radius: 5px; border: 1px solid #eccaca;">
-                📥 <strong>Archivo Generado:</strong> Se ha creado una presentación premium en:<br>
-                <code>${filePath}</code>
-            </p>`;
-
-            console.log(`✨ [${this.name}] Presentación HTML generada en: ${filePath}`);
+            presentationLink = `<div style="background: #fff4f4; padding: 20px; border: 2px solid #b71c1c; margin-top: 20px;">
+                <strong>📂 ARCHIVO ESTRATÉGICO GENERADO:</strong><br>
+                Presentación HTML en: <code>${filePath}</code>
+            </div>`;
         }
 
-        const subject = `[INFORME GLADYS] Hallazgos sobre ${query}`;
+        const subject = `[INFORME GLADYS] ${query.toUpperCase()}`;
         const htmlBody = `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; border: 2px solid #b71c1c; padding: 25px; border-radius: 10px;">
-                <h1 style="color: #b71c1c; margin-top: 0;">✊ Gladys Marín Informa</h1>
-                <p style="font-style: italic; color: #555;">"${this.motto}"</p>
-                <hr style="border: 0.5px solid #eee;">
-                <div style="line-height: 1.6;">
+            <div style="font-family: Arial, sans-serif; border: 3px solid #b71c1c; padding: 30px; border-radius: 5px;">
+                <h1 style="color: #b71c1c; border-bottom: 2px solid #b71c1c; padding-bottom: 10px;">🚩 Gladys Marín: Informe de Inteligencia</h1>
+                <p style="font-style: italic;">"${this.motto}"</p>
+                <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
                     ${formattedContent.replace(/\n/g, '<br>')}
                 </div>
                 ${presentationLink}
-                <div style="margin-top: 40px; font-size: 0.85em; border-top: 1px solid #ddd; padding-top: 10px; color: #777;">
-                    <strong>Agente:</strong> Gladys Marín (Investigación y Formatos)<br>
-                    <strong>Estado:</strong> Información liberada.
+                <div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px; font-size: 0.9em; color: #666;">
+                    <strong>Departamento:</strong> Investigación y Análisis Crítico<br>
+                    <strong>Destino Primario:</strong> profepablo2010@gmail.com
                 </div>
             </div>
         `;
 
-        console.log(`📧 [${this.name}] Entregando hallazgos al agente de correo...`);
-        return await sendEmailAsPutin(targetEmail, subject, formattedContent, htmlBody);
+        console.log(`📧 [${this.name}] Enviando investigación FUERTE a ${targetEmail}...`);
+        return await sendEmailAs_Putin_Fixed(targetEmail, subject, formattedContent, htmlBody);
     }
 }
+
+// Función auxiliar para forzar el destinatario si no se indica otro
+async function sendEmailAs_Putin_Fixed(email, subject, text, html) {
+    const finalEmail = (email === 'yek.patty@gmail.com' || !email) ? 'profepablo2010@gmail.com' : email;
+    return await sendEmailAsPutin(finalEmail, subject, text, html);
+}
+
+// Ejecución de prueba
+if (require.main === module) {
+    const gladys = new GladysMarin();
+    const query = process.argv[2] || "Oportunidades de Financiamiento Educación 2026 Chile";
+    const format = process.argv[3] || "formal";
+
+    gladys.runMission(query, format).then(success => {
+        if (success) {
+            console.log('✅ Misión cumplida con éxito.');
+            console.log('🚩 GLADYS: "¡A luchar, a luchar! El pueblo va a triunfar."');
+        } else console.log('❌ Error en la entrega.');
+    });
+}
+
+module.exports = GladysMarin;
 
 // Ejecución de prueba si se llama directamente
 if (require.main === module) {
